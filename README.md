@@ -1,6 +1,6 @@
 # ProFootball - Live Match Center
 
-A real-time football match center built with Next.js 14, featuring live match updates, statistics, and chat functionality.
+A real-time football match center built with Next.js 16, featuring live match updates, statistics, and chat functionality.
 
 ## Features
 
