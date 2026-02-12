@@ -6,12 +6,12 @@ export type MatchStatus =
   | "FULL_TIME";
 
 export type EventType =
-  | "GOAL"
-  | "YELLOW_CARD"
-  | "RED_CARD"
-  | "SUBSTITUTION"
-  | "FOUL"
-  | "SHOT";
+  | "goal"
+  | "yellow_card"
+  | "red_card"
+  | "substitution"
+  | "foul"
+  | "shot";
 
 export interface Team {
   id: string;
