@@ -6,7 +6,7 @@ import { useUserStore } from "@/store/userStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send, ChevronDown, ChevronUp } from "lucide-react";
 import { ChatMessage, TypingIndicator } from "@/utils/types";
 
 interface MatchChatProps {
@@ -20,6 +20,7 @@ export function MatchChat({ matchId }: MatchChatProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
   const [hasJoined, setHasJoined] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -138,76 +139,92 @@ export function MatchChat({ matchId }: MatchChatProps) {
   };
 
   return (
-    <Card className="border-zinc-800 h-[500px] flex flex-col">
+    <Card className="border-zinc-800 flex flex-col max-h-[600px]">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg">Live Chat</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">Live Chat</CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsOpen(!isOpen)}
+            className="h-6 px-2"
+          >
+            {isOpen ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-0">
-        <div className="flex-1 overflow-y-auto px-4 space-y-3">
-          {messages.map((msg, idx) => (
-            <div
-              key={`${msg.timestamp}-${idx}`}
-              className={`${
-                msg.userId === "system"
-                  ? "text-center text-xs text-muted-foreground"
-                  : msg.userId === userId
-                    ? "text-right"
-                    : "text-left"
-              }`}
-            >
-              {msg.userId !== "system" && (
-                <>
-                  <p className="text-xs font-medium text-emerald-500 mb-1">
-                    {msg.userId === userId ? "You" : msg.username}
-                  </p>
-                  <div
-                    className={`inline-block px-3 py-2 rounded-lg ${
-                      msg.userId === userId
-                        ? "bg-emerald-600 text-white"
-                        : "bg-zinc-800"
-                    }`}
-                  >
-                    <p className="text-sm break-words">{msg.message}</p>
-                  </div>
-                </>
-              )}
-              {msg.userId === "system" && <p>{msg.message}</p>}
+      {isOpen && (
+        <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-4 space-y-3 min-h-0">
+            {messages.map((msg, idx) => (
+              <div
+                key={`${msg.timestamp}-${idx}`}
+                className={`${
+                  msg.userId === "system"
+                    ? "text-center text-xs text-muted-foreground"
+                    : msg.userId === userId
+                      ? "text-right"
+                      : "text-left"
+                }`}
+              >
+                {msg.userId !== "system" && (
+                  <>
+                    <p className="text-xs font-medium text-emerald-500 mb-1">
+                      {msg.userId === userId ? "You" : msg.username}
+                    </p>
+                    <div
+                      className={`inline-block px-3 py-2 rounded-lg ${
+                        msg.userId === userId
+                          ? "bg-emerald-600 text-white"
+                          : "bg-zinc-800"
+                      }`}
+                    >
+                      <p className="text-sm break-words">{msg.message}</p>
+                    </div>
+                  </>
+                )}
+                {msg.userId === "system" && <p>{msg.message}</p>}
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {typingUsers.size > 0 && (
+            <div className="px-4 py-2 text-xs text-muted-foreground">
+              {Array.from(typingUsers).join(", ")}{" "}
+              {typingUsers.size === 1 ? "is" : "are"} typing...
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+          )}
 
-        {typingUsers.size > 0 && (
-          <div className="px-4 py-2 text-xs text-muted-foreground">
-            {Array.from(typingUsers).join(", ")}{" "}
-            {typingUsers.size === 1 ? "is" : "are"} typing...
+          <div className="p-4 border-t border-zinc-800">
+            <div className="flex gap-2">
+              <Input
+                value={inputMessage}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                placeholder="Type a message..."
+                maxLength={500}
+                disabled={!isConnected}
+                className="bg-zinc-900 border-zinc-800"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!isConnected || !inputMessage.trim()}
+                size="icon"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {inputMessage.length}/500 characters
+            </p>
           </div>
-        )}
-
-        <div className="p-4 border-t border-zinc-800">
-          <div className="flex gap-2">
-            <Input
-              value={inputMessage}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              placeholder="Type a message..."
-              maxLength={500}
-              disabled={!isConnected}
-              className="bg-zinc-900 border-zinc-800"
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!isConnected || !inputMessage.trim()}
-              size="icon"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            {inputMessage.length}/500 characters
-          </p>
-        </div>
-      </CardContent>
+        </CardContent>
+      )}
     </Card>
   );
 }

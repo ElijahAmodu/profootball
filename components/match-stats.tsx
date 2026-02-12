@@ -11,8 +11,8 @@ export function MatchStats({ statistics }: MatchStatsProps) {
   const stats = [
     {
       label: "Possession",
-      home: statistics.possession.home,
-      away: statistics.possession.away,
+      home: Math.ceil(statistics.possession.home),
+      away: Math.ceil(statistics.possession.away),
       suffix: "%",
     },
     {

@@ -163,7 +163,3 @@ No environment variables required - all configuration is in the codebase.
 - Chrome/Edge (latest)
 - Firefox (latest)
 - Safari (latest)
-
-## License
-
-MIT
